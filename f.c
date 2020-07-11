@@ -45,15 +45,26 @@ void main(int argc, char **argv) {
     char charNumber[strlen(argv[1])];
     char temporaryCharNumber;
     bool isNegative = false;
+    bool isNotNumber = true;
 
     strcpy(charNumber, argv[1]);
     for(i = strlen(charNumber); i > 0; i--) {
         temporaryCharNumber = charNumber[i - 1];
+        //printf("TemporaryCharNumber: %c\n", temporaryCharNumber);
         if(temporaryCharNumber == '-') {
             puts("Negative Integer Fault");
             exit(0);
         }
         mpz_set_si(number, atoi(&temporaryCharNumber));
+        if(mpz_cmp_si(number, 0) == 0) {
+            if(temporaryCharNumber == '.') {
+                puts("Floating Point Number Error");
+                exit(0);
+            } else if(temporaryCharNumber != '0') {
+                puts("Non-Numerical Value Error");
+                exit(0);
+            }
+        }
         //gmp_printf("Number: %Zd CharNumber: %c\n", number, temporaryCharNumber);
         //gmp_printf("Place Value: %Zd * Number: %Zd\n", placeValue, number);
         mpz_mul(number, number, placeValue);
@@ -68,15 +79,23 @@ void main(int argc, char **argv) {
         exit(0);
     }
     mpz_set_ui(number, 1);
+    mpz_t howManyFactors;
+    mpz_init_set_ui(howManyFactors, 0);
     gmp_printf("%Zd => ( ", theNumber);
     while(true) {
-        if(mpz_divisible_p(theNumber, number) != 0) gmp_printf("%Zd, ", number);
+        if(mpz_divisible_p(theNumber, number) != 0) {
+            gmp_printf("%Zd, ", number);
+            mpz_add_ui(howManyFactors, howManyFactors, 1);
+        }
         mpz_add_ui(number, number, 1);
         if(mpz_cmp(theNumber, number) == 0) {
-            gmp_printf("%Zd )\n", number);
+            mpz_add_ui(howManyFactors, howManyFactors, 1);
+            gmp_printf("%Zd ) ", number);
+            gmp_printf("%Zd\n", howManyFactors);
             break;
         }
     }
+    mpz_clear(howManyFactors);
     mpz_clear(number);
     mpz_clear(theNumber);
 }
