@@ -1,2 +1,2 @@
 # /usr/bin/bash
-gcc F.c -o F -g -lgmp
+gcc f.c -o f -g -lgmp
